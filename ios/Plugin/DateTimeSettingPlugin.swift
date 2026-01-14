@@ -6,8 +6,8 @@ import Capacitor
  * 
  * Capacitor plugin to check auto time/timezone settings and open device settings.
  * 
- * Note: iOS does not provide APIs to check if auto time/timezone is enabled.
- * The timeIsAuto and timeZoneIsAuto methods will return false with a note.
+ * iOS implementation uses TimeZone.autoupdatingCurrent to determine
+ * if the device is set to automatically update its time zone and date/time settings.
  */
 @objc(DateTimeSettingPlugin)
 public class DateTimeSettingPlugin: CAPPlugin {
@@ -15,42 +15,39 @@ public class DateTimeSettingPlugin: CAPPlugin {
     /**
      * Check if automatic time is enabled on the device.
      * 
-     * iOS Implementation:
-     * Uses NSTimeZone.autoupdatingCurrent comparison with NSTimeZone.system
-     * to determine if automatic date/time is enabled.
-     * 
-     * When auto date/time is ON: autoupdatingCurrent equals system timezone
-     * When auto date/time is OFF: they may differ
+     * iOS implementation uses TimeZone.autoupdatingCurrent to determine
+     * if the device is set to automatically update its time zone and date/time settings.
      */
     @objc func timeIsAuto(_ call: CAPPluginCall) {
-        let autoUpdatingTimeZone = NSTimeZone.autoupdatingCurrent
-        let systemTimeZone = NSTimeZone.system
-        
-        // If they are equal, auto date/time is likely enabled
-        let isAutoEnabled = autoUpdatingTimeZone.isEqual(to: systemTimeZone)
-        
+        let isAuto = checkAutoDateTime()
         call.resolve([
-            "value": isAutoEnabled
+            "value": isAuto
         ])
     }
     
     /**
      * Check if automatic timezone is enabled on the device.
      * 
-     * iOS Implementation:
-     * Uses the same NSTimeZone comparison technique as timeIsAuto.
-     * This is because iOS doesn't separate auto time and auto timezone settings.
+     * iOS implementation uses TimeZone.autoupdatingCurrent to determine
+     * if the device is set to automatically update its time zone.
      */
     @objc func timeZoneIsAuto(_ call: CAPPluginCall) {
-        let autoUpdatingTimeZone = NSTimeZone.autoupdatingCurrent
-        let systemTimeZone = NSTimeZone.system
-        
-        // If they are equal, auto timezone is likely enabled
-        let isAutoEnabled = autoUpdatingTimeZone.isEqual(to: systemTimeZone)
-        
+        let isAuto = checkAutoDateTime()
         call.resolve([
-            "value": isAutoEnabled
+            "value": isAuto
         ])
+    }
+    
+    /**
+     * Helper method to check if auto date/time is enabled.
+     * 
+     * Compares the autoupdating timezone with the system timezone.
+     * If they are equal, auto date/time is enabled.
+     */
+    private func checkAutoDateTime() -> Bool {
+        let autoUpdatingTimeZone = TimeZone.autoupdatingCurrent
+        let systemTimeZone = TimeZone.current
+        return autoUpdatingTimeZone == systemTimeZone
     }
     
     /**
