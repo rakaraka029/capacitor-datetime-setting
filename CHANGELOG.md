@@ -1,32 +1,38 @@
-# Capacitor DateTime Setting Plugin
+# Changelog
 
-## Changelog
+All notable changes to this project will be documented in this file.
+
+## [1.1.2] - 2026-01-14
+
+### Fixed
+- **iOS**: Fixed `Type 'NSTimeZone' has no member 'autoupdatingCurrent'` error
+  - Changed from `NSTimeZone.autoupdatingCurrent` to `TimeZone.autoupdatingCurrent` (Swift native type)
+  - Changed from `NSTimeZone.system` to `TimeZone.current`
+  - Added `checkAutoDateTime()` helper method for cleaner code
+  - Now properly detects auto date/time settings on iOS devices
+
+## [1.1.1] - 2026-01-14
+
+### Fixed
+- **iOS**: Renamed podspec file to match scoped npm package naming convention
+  - Changed from `CapacitorDatetimeSetting.podspec` to `GreatdayhrCapacitorDatetimeSetting.podspec`
+  - Fixed CocoaPods installation error: "No podspec found for `GreatdayhrCapacitorDatetimeSetting`"
 
 ## [1.1.0] - 2026-01-14
 
-### Added
-- iOS auto date/time detection using NSTimeZone comparison technique
-- Both `timeIsAuto()` and `timeZoneIsAuto()` now return actual values on iOS
-
 ### Changed
-- Updated iOS implementation to use `NSTimeZone.autoupdatingCurrent` comparison
-- Improved documentation with platform-specific implementation details
+- Upgraded to Capacitor 7
+- Updated all dependencies to latest versions
+- Updated peer dependencies to `@capacitor/core@^7.0.0`
 
-### Credits
-- iOS detection technique inspired by [date_change_checker](https://github.com/error404sushant/date_change_checker) Flutter plugin
+### Added
+- iOS implementation for checking auto time/timezone settings
+- Added proper documentation for iOS limitations
 
-## [1.0.0] - 2026-01-14
+## [1.0.1] - 2026-01-13
 
-### 1.0.0 (2026-01-14)
-
-Initial release
-
-**Features:**
-- Check if automatic time is enabled (`timeIsAuto()`)
-- Check if automatic timezone is enabled (`timeZoneIsAuto()`)
-- Open device date/time settings (`openSetting()`)
-
-**Platform Support:**
-- Android: Full support for all methods
-- iOS: Limited support (see README for details)
-- Web: Not supported
+### Added
+- Initial release
+- Android support for checking auto time/timezone settings
+- iOS support with basic implementation
+- Method to open device settings
