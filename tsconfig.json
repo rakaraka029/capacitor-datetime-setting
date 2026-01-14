@@ -2,12 +2,12 @@
     "compilerOptions": {
         "module": "ES2020",
         "moduleResolution": "node",
-        "target": "ES2017",
+        "target": "ES2020",
         "declaration": true,
         "declarationMap": true,
         "outDir": "./dist/esm",
         "lib": [
-            "ES2017"
+            "ES2020"
         ],
         "strict": true,
         "esModuleInterop": true,
