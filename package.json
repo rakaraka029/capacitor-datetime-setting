@@ -13,14 +13,14 @@
     "ios/Plugin/",
     "CapacitorDatetimeSetting.podspec"
   ],
-  "author": "Your Name",
+  "author": "rakaraka029",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/capacitor-datetime-setting.git"
+    "url": "git+https://github.com/rakaraka029/capacitor-datetime-setting.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/capacitor-datetime-setting/issues"
+    "url": "https://github.com/rakaraka029/capacitor-datetime-setting/issues"
   },
   "keywords": [
     "capacitor",
