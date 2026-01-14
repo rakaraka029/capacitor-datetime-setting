@@ -1,5 +1,5 @@
 {
-  "name": "capacitor-datetime-setting",
+  "name": "@greatdayhr/capacitor-datetime-setting",
   "version": "1.0.0",
   "description": "Capacitor plugin to get information about auto time and auto timezone, open setting if not set to auto",
   "main": "dist/plugin.cjs.js",
