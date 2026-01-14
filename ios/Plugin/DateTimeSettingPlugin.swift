@@ -15,28 +15,41 @@ public class DateTimeSettingPlugin: CAPPlugin {
     /**
      * Check if automatic time is enabled on the device.
      * 
-     * Note: iOS does not provide an API to check this setting.
-     * This method returns false as iOS doesn't expose this information.
+     * iOS Implementation:
+     * Uses NSTimeZone.autoupdatingCurrent comparison with NSTimeZone.system
+     * to determine if automatic date/time is enabled.
+     * 
+     * When auto date/time is ON: autoupdatingCurrent equals system timezone
+     * When auto date/time is OFF: they may differ
      */
     @objc func timeIsAuto(_ call: CAPPluginCall) {
-        // iOS does not provide API to check auto time setting
-        // We return false as we cannot determine the actual state
+        let autoUpdatingTimeZone = NSTimeZone.autoupdatingCurrent
+        let systemTimeZone = NSTimeZone.system
+        
+        // If they are equal, auto date/time is likely enabled
+        let isAutoEnabled = autoUpdatingTimeZone.isEqual(to: systemTimeZone)
+        
         call.resolve([
-            "value": false
+            "value": isAutoEnabled
         ])
     }
     
     /**
      * Check if automatic timezone is enabled on the device.
      * 
-     * Note: iOS does not provide an API to check this setting.
-     * This method returns false as iOS doesn't expose this information.
+     * iOS Implementation:
+     * Uses the same NSTimeZone comparison technique as timeIsAuto.
+     * This is because iOS doesn't separate auto time and auto timezone settings.
      */
     @objc func timeZoneIsAuto(_ call: CAPPluginCall) {
-        // iOS does not provide API to check auto timezone setting
-        // We return false as we cannot determine the actual state
+        let autoUpdatingTimeZone = NSTimeZone.autoupdatingCurrent
+        let systemTimeZone = NSTimeZone.system
+        
+        // If they are equal, auto timezone is likely enabled
+        let isAutoEnabled = autoUpdatingTimeZone.isEqual(to: systemTimeZone)
+        
         call.resolve([
-            "value": false
+            "value": isAutoEnabled
         ])
     }
     

@@ -20,8 +20,8 @@ Check if automatic time is enabled on the device.
 **Returns:** `Promise<{ value: boolean }>`
 
 **Platform Support:**
-- ✅ Android: Returns actual setting value
-- ⚠️ iOS: Always returns `false` (iOS doesn't provide API to check this)
+- ✅ Android: Returns actual setting value using `Settings.Global.AUTO_TIME`
+- ✅ iOS: Returns actual setting value using `NSTimeZone.autoupdatingCurrent` comparison
 
 **Example:**
 
@@ -41,8 +41,8 @@ Check if automatic timezone is enabled on the device.
 **Returns:** `Promise<{ value: boolean }>`
 
 **Platform Support:**
-- ✅ Android: Returns actual setting value
-- ⚠️ iOS: Always returns `false` (iOS doesn't provide API to check this)
+- ✅ Android: Returns actual setting value using `Settings.Global.AUTO_TIME_ZONE`
+- ✅ iOS: Returns actual setting value using `NSTimeZone.autoupdatingCurrent` comparison
 
 **Example:**
 
@@ -88,21 +88,11 @@ async function checkAutoTimeSettings() {
     
     const platform = Capacitor.getPlatform();
     
-    if (platform === 'android') {
-      if (!timeResult.value || !timezoneResult.value) {
-        // Show alert to user
-        const shouldOpen = confirm(
-          'Please enable automatic date & time and timezone for accurate time tracking.'
-        );
-        
-        if (shouldOpen) {
-          await DateTimeSetting.openSetting();
-        }
-      }
-    } else if (platform === 'ios') {
-      // iOS doesn't provide API to check, so we can only prompt user to check manually
+    // Both Android and iOS can now detect auto time settings
+    if (!timeResult.value || !timezoneResult.value) {
+      // Show alert to user
       const shouldOpen = confirm(
-        'Please ensure automatic date & time is enabled in Settings.'
+        'Please enable automatic date & time and timezone for accurate time tracking.'
       );
       
       if (shouldOpen) {
@@ -125,16 +115,18 @@ The plugin uses Android's `Settings.Global` API to check the auto time and timez
 
 ### iOS
 
-iOS does not provide public APIs to:
-- Check if automatic date & time is enabled
-- Check if automatic timezone is enabled
-- Open the Date & Time settings page directly
+iOS does not provide direct public APIs to check auto date/time settings, but this plugin uses a **workaround** technique:
 
-Therefore:
-- `timeIsAuto()` and `timeZoneIsAuto()` always return `false`
-- `openSetting()` opens the main Settings app instead of the specific Date & Time page
+**Detection Method:**
+- Compares `NSTimeZone.autoupdatingCurrent` with `NSTimeZone.system`
+- When auto date/time is **enabled**: these two timezone objects are equal
+- When auto date/time is **disabled**: they may differ
 
-This is a platform limitation, not a plugin limitation.
+**Limitations:**
+- `openSetting()` opens the main Settings app instead of the specific Date & Time page (iOS restriction)
+- The detection method is a workaround and may not be 100% accurate in all edge cases
+
+**Credit:** This technique is inspired by the Flutter [date_change_checker](https://github.com/error404sushant/date_change_checker) plugin.
 
 ### Web
 
