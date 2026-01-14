@@ -1,6 +1,6 @@
 {
   "name": "@greatdayhr/capacitor-datetime-setting",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Capacitor plugin to get information about auto time and auto timezone, open setting if not set to auto",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/src",
     "dist/",
     "ios/Plugin/",
-    "CapacitorDatetimeSetting.podspec"
+    "GreatdayhrCapacitorDatetimeSetting.podspec"
   ],
   "author": "rakaraka029",
   "license": "MIT",
