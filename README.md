@@ -14,8 +14,8 @@ Capacitor plugin for comprehensive date/time management on iOS. Cloned from [dat
 - Network-optimized with caching and offline fallback
 
 **Platform Support:**
-- ✅ **iOS**: Full implementation (10 methods)
-- ❌ **Android**: Not implemented (use native Settings API directly)
+- ✅ **iOS**: Full implementation (11 methods)
+- ✅ **Android**: 1 method (`isDateTimeChanged`)
 - ❌ **Web**: Not supported
 
 ## Installation
@@ -26,6 +26,33 @@ npx cap sync ios
 ```
 
 ## API
+
+### Simple Change Detection
+
+#### `isDateTimeChanged()`
+
+Check if date/time has been manually changed. Returns `true` if auto date/time is disabled (inverse of auto time enabled).
+
+This is a simple wrapper from date_change_checker source that provides a quick boolean check.
+
+**Returns:** `Promise<{ changed: boolean }>`
+
+**Platform Support:** 
+- ✅ iOS
+- ✅ Android
+
+**Example:**
+
+```typescript
+import { DateTimeSetting } from '@greatdayhr/capacitor-datetime-setting';
+
+const result = await DateTimeSetting.isDateTimeChanged();
+if (result.changed) {
+  console.log('Auto date/time is disabled - might be manually changed');
+}
+```
+
+---
 
 ### Date/Time Change Detection
 
@@ -421,7 +448,13 @@ This plugin is not supported on web. All methods will throw "Not implemented on 
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Latest version (2.0.0)**:
+**Latest version (2.0.1)**:
+- ✨ Added `isDateTimeChanged()` method for iOS and Android
+- 🔧 Simple wrapper returning inverse of `isAutoDateTimeEnabled`
+- 📱 Android now has 1 implemented method
+- 🎯 Total: 11 methods (iOS), 1 method (Android)
+
+**Previous version (2.0.0)**:
 - ✨ Cloned all iOS functionality from date_change_checker Flutter plugin
 - ✨ Added comprehensive date/time change detection methods (4 methods)
 - ✨ Added automatic user notifications for date/time changes (iOS)

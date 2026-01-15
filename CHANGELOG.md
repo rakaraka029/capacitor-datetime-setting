@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026-01-15
+
+### Added
+- **iOS & Android**: `isDateTimeChanged()` method - Simple wrapper that returns inverse of `isAutoDateTimeEnabled`
+  - Returns `true` if auto date/time is disabled, indicating possible manual changes
+  - Matches date_change_checker source implementation
+  - Available on both iOS and Android platforms
+
+### Technical Details
+- Method signature: `isDateTimeChanged(): Promise<{ changed: boolean }>`
+- iOS: Calls `AutoDateTimeDetector.isAutoDateTimeEnabled` and returns `!isEnabled`
+- Android: Checks `Settings.Global.AUTO_TIME` and returns inverse
+
+---
+
 ## [2.0.0] - 2026-01-15
 
 ### BREAKING CHANGES
