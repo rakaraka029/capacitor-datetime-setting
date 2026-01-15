@@ -4,10 +4,11 @@ import Capacitor
 /**
  * DateTimeSettingPlugin
  * 
- * Capacitor plugin to check auto time/timezone settings and open device settings.
+ * Capacitor plugin for comprehensive date/time change detection and management.
+ * Cloned from date_change_checker Flutter plugin.
  * 
  * iOS implementation uses network time comparison with AutoDateTimeDetector
- * for reliable detection of automatic date/time settings.
+ * for reliable detection of automatic date/time settings and changes.
  */
 @objc(DateTimeSettingPlugin)
 public class DateTimeSettingPlugin: CAPPlugin {
@@ -23,61 +24,193 @@ public class DateTimeSettingPlugin: CAPPlugin {
         AutoDateTimeDetector.stopNetworkMonitoring()
     }
     
+    // MARK: - Date/Time Change Detection
+    
     /**
-     * Check if automatic time is enabled on the device.
-     * 
-     * iOS implementation uses network time comparison for reliable detection.
-     * Results are cached for 30 seconds to minimize network calls.
+     * Detects if the device's date/time has been manually changed
      */
-    @objc func timeIsAuto(_ call: CAPPluginCall) {
-        AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+    @objc func detectDateTimeChange(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.detectDateTimeChange { changeDetected in
             DispatchQueue.main.async {
                 call.resolve([
-                    "value": isEnabled
+                    "changed": changeDetected
                 ])
             }
         }
     }
     
     /**
-     * Check if automatic timezone is enabled on the device.
-     * 
-     * iOS implementation uses the same detection as timeIsAuto since
-     * auto timezone and auto date/time are typically linked on iOS.
+     * Comprehensive date and time change detection with detailed analysis
      */
-    @objc func timeZoneIsAuto(_ call: CAPPluginCall) {
-        AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+    @objc func detectComprehensiveDateTimeChange(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.detectComprehensiveDateTimeChange { result in
             DispatchQueue.main.async {
-                call.resolve([
-                    "value": isEnabled
-                ])
-            }
-        }
-    }
-    
-    /**
-     * Open the device's Settings app.
-     * 
-     * On iOS, this opens the main Settings app as there's no direct way
-     * to open the Date & Time settings page.
-     */
-    @objc func openSetting(_ call: CAPPluginCall) {
-        DispatchQueue.main.async {
-            if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-                if UIApplication.shared.canOpenURL(settingsUrl) {
-                    UIApplication.shared.open(settingsUrl, options: [:]) { success in
-                        if success {
-                            call.resolve()
-                        } else {
-                            call.reject("Failed to open settings")
-                        }
-                    }
-                } else {
-                    call.reject("Cannot open settings URL")
+                let changeTypeString: String
+                switch result.changeType {
+                case .noChange:
+                    changeTypeString = "noChange"
+                case .timeOnly:
+                    changeTypeString = "timeOnly"
+                case .dateOnly:
+                    changeTypeString = "dateOnly"
+                case .dateAndTime:
+                    changeTypeString = "dateAndTime"
                 }
-            } else {
-                call.reject("Invalid settings URL")
+                
+                var resultDict: [String: Any] = [
+                    "changeType": changeTypeString,
+                    "timeDifference": result.timeDifference,
+                    "dateChanged": result.dateChanged,
+                    "timeChanged": result.timeChanged,
+                    "isAutoDateTimeEnabled": result.isAutoDateTimeEnabled,
+                    "currentDate": result.currentDate.timeIntervalSince1970
+                ]
+                
+                if let previousDate = result.previousDate {
+                    resultDict["previousDate"] = previousDate.timeIntervalSince1970
+                }
+                
+                call.resolve(resultDict)
             }
         }
+    }
+    
+    /**
+     * Detects specifically if only the date has been changed
+     */
+    @objc func detectDateOnlyChange(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.detectDateOnlyChange { changeDetected in
+            DispatchQueue.main.async {
+                call.resolve([
+                    "changed": changeDetected
+                ])
+            }
+        }
+    }
+    
+    /**
+     * Comprehensive date and time change detection with automatic notifications
+     */
+    @objc func detectAndNotifyDateTimeChanges(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.detectAndNotifyDateTimeChanges { result in
+            DispatchQueue.main.async {
+                let changeTypeString: String
+                switch result.changeType {
+                case .noChange:
+                    changeTypeString = "noChange"
+                case .timeOnly:
+                    changeTypeString = "timeOnly"
+                case .dateOnly:
+                    changeTypeString = "dateOnly"
+                case .dateAndTime:
+                    changeTypeString = "dateAndTime"
+                }
+                
+                var resultDict: [String: Any] = [
+                    "changeType": changeTypeString,
+                    "timeDifference": result.timeDifference,
+                    "dateChanged": result.dateChanged,
+                    "timeChanged": result.timeChanged,
+                    "isAutoDateTimeEnabled": result.isAutoDateTimeEnabled,
+                    "currentDate": result.currentDate.timeIntervalSince1970
+                ]
+                
+                if let previousDate = result.previousDate {
+                    resultDict["previousDate"] = previousDate.timeIntervalSince1970
+                }
+                
+                call.resolve(resultDict)
+            }
+        }
+    }
+    
+    // MARK: - Time Utilities
+    
+    /**
+     * Get the device's current local time
+     */
+    @objc func getLocalTime(_ call: CAPPluginCall) {
+        let currentTime = AutoDateTimeDetector.getCurrentLocalTime()
+        let timestamp = currentTime.timeIntervalSince1970
+        call.resolve([
+            "timestamp": timestamp
+        ])
+    }
+    
+    /**
+     * Fetch accurate UTC time from internet time server
+     */
+    @objc func getInternetUTCTime(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.fetchInternetUTCTime { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let utcTime):
+                    let timestamp = utcTime.timeIntervalSince1970
+                    call.resolve([
+                        "timestamp": timestamp
+                    ])
+                case .failure(let error):
+                    call.reject("Failed to fetch internet time", nil, error)
+                }
+            }
+        }
+    }
+    
+    /**
+     * Convert local time to UTC
+     */
+    @objc func convertToLocalTime(_ call: CAPPluginCall) {
+        guard let timestamp = call.getDouble("timestamp") else {
+            call.reject("Missing timestamp parameter")
+            return
+        }
+        
+        let localTime = Date(timeIntervalSince1970: timestamp)
+        let utcTime = AutoDateTimeDetector.convertLocalTimeToUTC(localTime)
+        let utcTimestamp = utcTime.timeIntervalSince1970
+        
+        call.resolve([
+            "timestamp": utcTimestamp
+        ])
+    }
+    
+    // MARK: - Timestamp Management
+    
+    /**
+     * Set the stored timestamp for future change detection
+     */
+    @objc func setStoredTimestamp(_ call: CAPPluginCall) {
+        guard let timestamp = call.getDouble("timestamp") else {
+            call.reject("Missing timestamp parameter")
+            return
+        }
+        
+        let date = Date(timeIntervalSince1970: timestamp)
+        AutoDateTimeDetector.setStoredTimestamp(date)
+        call.resolve()
+    }
+    
+    /**
+     * Get the currently stored timestamp
+     */
+    @objc func getStoredTimestamp(_ call: CAPPluginCall) {
+        if let storedTime = AutoDateTimeDetector.getStoredTimestamp() {
+            let timestamp = storedTime.timeIntervalSince1970
+            call.resolve([
+                "timestamp": timestamp
+            ])
+        } else {
+            call.resolve([
+                "timestamp": NSNull()
+            ])
+        }
+    }
+    
+    /**
+     * Reset the detector (clears all stored data and cache)
+     */
+    @objc func resetDetector(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.reset()
+        call.resolve()
     }
 }
