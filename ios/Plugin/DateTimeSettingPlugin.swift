@@ -6,48 +6,53 @@ import Capacitor
  * 
  * Capacitor plugin to check auto time/timezone settings and open device settings.
  * 
- * iOS implementation uses TimeZone.autoupdatingCurrent to determine
- * if the device is set to automatically update its time zone and date/time settings.
+ * iOS implementation uses network time comparison with AutoDateTimeDetector
+ * for reliable detection of automatic date/time settings.
  */
 @objc(DateTimeSettingPlugin)
 public class DateTimeSettingPlugin: CAPPlugin {
     
+    override public func load() {
+        super.load()
+        // Initialize the AutoDateTimeDetector
+        AutoDateTimeDetector.initialize()
+    }
+    
+    deinit {
+        // Clean up network monitoring when plugin is deallocated
+        AutoDateTimeDetector.stopNetworkMonitoring()
+    }
+    
     /**
      * Check if automatic time is enabled on the device.
      * 
-     * iOS implementation uses TimeZone.autoupdatingCurrent to determine
-     * if the device is set to automatically update its time zone and date/time settings.
+     * iOS implementation uses network time comparison for reliable detection.
+     * Results are cached for 30 seconds to minimize network calls.
      */
     @objc func timeIsAuto(_ call: CAPPluginCall) {
-        let isAuto = checkAutoDateTime()
-        call.resolve([
-            "value": isAuto
-        ])
+        AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+            DispatchQueue.main.async {
+                call.resolve([
+                    "value": isEnabled
+                ])
+            }
+        }
     }
     
     /**
      * Check if automatic timezone is enabled on the device.
      * 
-     * iOS implementation uses TimeZone.autoupdatingCurrent to determine
-     * if the device is set to automatically update its time zone.
+     * iOS implementation uses the same detection as timeIsAuto since
+     * auto timezone and auto date/time are typically linked on iOS.
      */
     @objc func timeZoneIsAuto(_ call: CAPPluginCall) {
-        let isAuto = checkAutoDateTime()
-        call.resolve([
-            "value": isAuto
-        ])
-    }
-    
-    /**
-     * Helper method to check if auto date/time is enabled.
-     * 
-     * Compares the autoupdating timezone with the system timezone.
-     * If they are equal, auto date/time is enabled.
-     */
-    private func checkAutoDateTime() -> Bool {
-        let autoUpdatingTimeZone = TimeZone.autoupdatingCurrent
-        let systemTimeZone = TimeZone.current
-        return autoUpdatingTimeZone == systemTimeZone
+        AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+            DispatchQueue.main.async {
+                call.resolve([
+                    "value": isEnabled
+                ])
+            }
+        }
     }
     
     /**

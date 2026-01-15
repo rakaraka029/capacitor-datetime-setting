@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-01-14
+
+### Changed
+- **iOS**: Significantly improved auto date/time detection using network time comparison
+  - Changed from simple `TimeZone.autoupdatingCurrent` check to network-based time server comparison
+  - Added caching mechanism (30 seconds) to minimize network calls and improve performance
+  - Better offline fallback behavior using timezone check
+  - More reliable detection of manual time changes
+
+### Added
+- **iOS**: Network-based time server comparison for reliable auto date/time detection
+- **iOS**: Result caching for 30 seconds to optimize performance
+- **iOS**: Network monitoring for battery optimization
+- **iOS**: `AutoDateTimeDetector` class for comprehensive time detection
+
+### Technical Details
+- Uses `https://worldtimeapi.org/api/timezone/Etc/UTC` for accurate time reference
+- Considers auto time disabled if device time differs from server time by more than 60 seconds
+- Falls back to offline detection when network is unavailable
+- Async detection to avoid blocking the main thread
+
 ## [1.1.2] - 2026-01-14
 
 ### Fixed
