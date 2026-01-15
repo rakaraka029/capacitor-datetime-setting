@@ -5,6 +5,9 @@
 // Define the plugin using the CAP_PLUGIN Macro, and
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
 CAP_PLUGIN(DateTimeSettingPlugin, "DateTimeSetting",
+           // Simple change detection
+           CAP_PLUGIN_METHOD(isDateTimeChanged, CAPPluginReturnPromise);
+           
            // Date/Time Change Detection
            CAP_PLUGIN_METHOD(detectDateTimeChange, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(detectComprehensiveDateTimeChange, CAPPluginReturnPromise);

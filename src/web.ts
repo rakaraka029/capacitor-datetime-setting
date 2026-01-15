@@ -3,6 +3,10 @@ import { WebPlugin } from '@capacitor/core';
 import type { DateTimeSettingPlugin, DateTimeChangeResult } from './definitions';
 
 export class DateTimeSettingWeb extends WebPlugin implements DateTimeSettingPlugin {
+    async isDateTimeChanged(): Promise<{ changed: boolean }> {
+        throw this.unimplemented('Not implemented on web.');
+    }
+
     // Date/Time Change Detection
     async detectDateTimeChange(): Promise<{ changed: boolean }> {
         throw this.unimplemented('Not implemented on web.');

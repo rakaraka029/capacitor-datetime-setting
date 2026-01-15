@@ -24,6 +24,24 @@ public class DateTimeSettingPlugin: CAPPlugin {
         AutoDateTimeDetector.stopNetworkMonitoring()
     }
     
+    /**
+     * Check if date/time has been manually changed (inverse of auto time enabled).
+     * This is a simple wrapper that returns !isAutoDateTimeEnabled.
+     * 
+     * From date_change_checker source:
+     * Returns true if auto date/time is disabled, indicating possible manual changes.
+     */
+    @objc func isDateTimeChanged(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+            DispatchQueue.main.async {
+                // Return !isEnabled to indicate if date/time has been changed
+                call.resolve([
+                    "changed": !isEnabled
+                ])
+            }
+        }
+    }
+    
     // MARK: - Date/Time Change Detection
     
     /**

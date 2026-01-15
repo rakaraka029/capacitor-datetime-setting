@@ -39,6 +39,25 @@ export interface DateTimeChangeResult {
 }
 
 export interface DateTimeSettingPlugin {
+    /**
+     * Check if date/time has been manually changed.
+     * Returns true if auto date/time is disabled (inverse of auto time enabled).
+     * 
+     * This is a simple wrapper from date_change_checker source.
+     * 
+     * @returns Promise with boolean indicating if auto time is disabled
+     * @since 2.0.1
+     * 
+     * @example
+     * ```typescript
+     * const result = await DateTimeSetting.isDateTimeChanged();
+     * if (result.changed) {
+     *   console.log('Auto date/time is disabled - might be manually changed');
+     * }
+     * ```
+     */
+    isDateTimeChanged(): Promise<{ changed: boolean }>;
+    
     // ===== Date/Time Change Detection =====
 
     /**
