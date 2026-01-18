@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-01-18
+
+### Fixed
+- **iOS**: Fixed Swift compilation error caused by unterminated comment block in `DateTimeSettingPlugin.swift`
+- Removed duplicate comment that was preventing iOS builds from succeeding
+
+---
+
 ## [2.1.0] - 2026-01-18
 
 ### Added
