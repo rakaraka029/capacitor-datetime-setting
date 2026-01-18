@@ -25,9 +25,6 @@ public class DateTimeSettingPlugin: CAPPlugin {
     }
     
     /**
-     * Check if date/time has been manually changed (inverse of auto time enabled).
-     * This is a simple wrapper that returns !isAutoDateTimeEnabled.
-     /**
      * Check if date/time has been manually changed.
      * Returns true if auto date/time is disabled (inverse of auto time enabled).
      * 
