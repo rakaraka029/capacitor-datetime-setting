@@ -41,6 +41,22 @@ public class DateTimeSettingPlugin extends Plugin {
     }
     
     /**
+     * Simple check if date/time has been manually changed.
+     * Uses Settings.Global.AUTO_TIME check (same as isDateTimeChanged).
+     * 
+     * This method provides consistent behavior with iOS simple NTP check.
+     * Android uses Settings check instead of NTP.
+     * 
+     * @since 2.1.0
+     */
+    @PluginMethod
+    public void isDateTimeChangedSimple(PluginCall call) {
+        // Android: Reuse existing simple Settings check
+        // This matches Flutter plugin behavior where Android uses Settings
+        isDateTimeChanged(call);
+    }
+    
+    /**
      * Helper method to check if automatic date/time is enabled.
      * Uses Settings.Global.AUTO_TIME.
      */

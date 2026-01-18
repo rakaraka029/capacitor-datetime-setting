@@ -7,6 +7,10 @@ export class DateTimeSettingWeb extends WebPlugin implements DateTimeSettingPlug
         throw this.unimplemented('Not implemented on web.');
     }
 
+    async isDateTimeChangedSimple(): Promise<{ changed: boolean }> {
+        throw this.unimplemented('Not implemented on web.');
+    }
+
     // Date/Time Change Detection
     async detectDateTimeChange(): Promise<{ changed: boolean }> {
         throw this.unimplemented('Not implemented on web.');

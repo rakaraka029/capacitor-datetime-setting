@@ -1,6 +1,6 @@
 {
   "name": "@greatdayhr/capacitor-datetime-setting",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Capacitor plugin for comprehensive iOS date/time change detection. Cloned from date_change_checker Flutter plugin.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

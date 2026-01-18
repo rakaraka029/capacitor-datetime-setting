@@ -392,6 +392,72 @@ class AutoDateTimeDetector {
     private static let statusCacheInterval: TimeInterval = 30.0 // Cache for 30 seconds
     
     /**
+     * Simple NTP-based check if automatic date/time is enabled (matches Flutter plugin behavior)
+     * 
+     * This method provides a simplified detection approach without caching or complex fallback logic.
+     * It directly compares device time with NTP server time using a 30-second threshold.
+     * 
+     * Platform behavior:
+     * - Fetches device time (UTC)
+     * - Fetches NTP time from worldtimeapi.org
+     * - Compares time difference
+     * - Returns true if difference ≤ 30 seconds (auto time ON)
+     * - Returns false if difference > 30 seconds or network fails (auto time OFF)
+     * 
+     * @param completion Callback with detection result
+     */
+    static func isAutoDateTimeEnabledSimple(completion: @escaping (Bool) -> Void) {
+        // Get device time in UTC
+        let deviceTimeUtc = Date()
+        
+        // Create URL request to NTP time server
+        guard let url = URL(string: "https://worldtimeapi.org/api/timezone/Etc/UTC") else {
+            // Conservative approach: return false if URL creation fails
+            completion(false)
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 5.0 // 5 second timeout
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // Check for network errors
+            if let error = error {
+                print("Simple NTP check - Network error: \(error.localizedDescription)")
+                // Conservative approach: return false on network failure (matching Flutter)
+                completion(false)
+                return
+            }
+            
+            // Parse response data
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let unixTimeString = json["unixtime"] as? Double else {
+                print("Simple NTP check - Failed to parse server response")
+                // Conservative approach: return false on parse failure
+                completion(false)
+                return
+            }
+            
+            // Get NTP time
+            let ntpTimeUtc = Date(timeIntervalSince1970: unixTimeString)
+            
+            // Calculate time difference in seconds
+            let timeDifferenceSeconds = abs(deviceTimeUtc.timeIntervalSince(ntpTimeUtc))
+            
+            // Simple threshold check: 30 seconds (matching Flutter plugin)
+            let isAutoEnabled = timeDifferenceSeconds <= 30.0
+            
+            print("Simple NTP check - Time difference: \(timeDifferenceSeconds)s, Auto enabled: \(isAutoEnabled)")
+            completion(isAutoEnabled)
+        }
+        
+        task.resume()
+    }
+    
+    /**
      * Checks if automatic date/time is enabled on iOS device (async version)
      * Uses caching to provide instant results and avoid network delays
      */

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-01-18
+
+### Added
+- **iOS & Android**: `isDateTimeChangedSimple()` method - Simple NTP-based detection matching Flutter plugin behavior
+  - iOS: Uses basic 30-second NTP threshold check without caching or complex fallback logic
+  - Android: Uses Settings.Global.AUTO_TIME check (same as existing implementation)
+  - Returns `true` if auto date/time is disabled or network fails (conservative approach)
+  - Provides simpler, more predictable alternative to `isDateTimeChanged()`
+
+### Technical Details
+- Method signature: `isDateTimeChangedSimple(): Promise<{ changed: boolean }>`
+- iOS: Direct NTP comparison with `worldtimeapi.org` using 30s threshold
+- Android: Reuses existing Settings check for consistency
+- No caching, network monitoring, or complex fallback - pure simple check
+- Matches Flutter `date_change_checker` plugin behavior exactly
+
+---
+
 ## [2.0.1] - 2026-01-15
 
 ### Added

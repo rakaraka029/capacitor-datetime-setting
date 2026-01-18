@@ -27,12 +27,37 @@ public class DateTimeSettingPlugin: CAPPlugin {
     /**
      * Check if date/time has been manually changed (inverse of auto time enabled).
      * This is a simple wrapper that returns !isAutoDateTimeEnabled.
+     /**
+     * Check if date/time has been manually changed.
+     * Returns true if auto date/time is disabled (inverse of auto time enabled).
      * 
-     * From date_change_checker source:
-     * Returns true if auto date/time is disabled, indicating possible manual changes.
+     * This is a simple wrapper from date_change_checker source.
+     * 
+     * @since 2.0.1
      */
     @objc func isDateTimeChanged(_ call: CAPPluginCall) {
         AutoDateTimeDetector.isAutoDateTimeEnabled { isEnabled in
+            DispatchQueue.main.async {
+                // Return !isEnabled to indicate if date/time has been changed
+                call.resolve([
+                    "changed": !isEnabled
+                ])
+            }
+        }
+    }
+    
+    /**
+     * Simple NTP-based check if date/time has been manually changed.
+     * Uses basic 30-second threshold comparison without caching.
+     * 
+     * This method matches Flutter plugin behavior exactly:
+     * - iOS: Compares device time with NTP server (30s threshold)
+     * - Returns true if auto time is disabled or network fails
+     * 
+     * @since 2.1.0
+     */
+    @objc func isDateTimeChangedSimple(_ call: CAPPluginCall) {
+        AutoDateTimeDetector.isAutoDateTimeEnabledSimple { isEnabled in
             DispatchQueue.main.async {
                 // Return !isEnabled to indicate if date/time has been changed
                 call.resolve([

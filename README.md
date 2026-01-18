@@ -14,8 +14,8 @@ Capacitor plugin for comprehensive date/time management on iOS. Cloned from [dat
 - Network-optimized with caching and offline fallback
 
 **Platform Support:**
-- ✅ **iOS**: Full implementation (11 methods)
-- ✅ **Android**: 1 method (`isDateTimeChanged`)
+- ✅ **iOS**: Full implementation (12 methods)
+- ✅ **Android**: 2 methods (`isDateTimeChanged`, `isDateTimeChangedSimple`)
 - ❌ **Web**: Not supported
 
 ## Installation
@@ -51,6 +51,47 @@ if (result.changed) {
   console.log('Auto date/time is disabled - might be manually changed');
 }
 ```
+
+---
+
+#### `isDateTimeChangedSimple()`
+
+Simple NTP-based check if date/time has been manually changed. Uses basic 30-second threshold comparison without caching.
+
+This method matches Flutter plugin behavior exactly and provides a simpler, more predictable alternative to `isDateTimeChanged()`.
+
+**Platform behavior:**
+- **iOS**: Compares device time with NTP server (30s threshold)
+- **Android**: Checks Settings.Global.AUTO_TIME
+- Returns `true` if auto time is disabled or network fails (conservative)
+
+**Returns:** `Promise<{ changed: boolean }>`
+
+**Platform Support:** 
+- ✅ iOS
+- ✅ Android
+
+**Example:**
+
+```typescript
+import { DateTimeSetting } from '@greatdayhr/capacitor-datetime-setting';
+
+const result = await DateTimeSetting.isDateTimeChangedSimple();
+if (result.changed) {
+  console.log('Auto date/time is disabled');
+  // This result matches Flutter plugin behavior exactly
+}
+```
+
+**When to use:**
+- ✅ When you need consistent behavior with Flutter `date_change_checker`
+- ✅ When you prefer simple, predictable NTP check without caching
+- ✅ When you want conservative detection (fails closed on network errors)
+
+**When to use `isDateTimeChanged()` instead:**
+- ✅ When you need faster responses (uses 30s cache)
+- ✅ When you need offline fallback with timezone checks
+- ✅ When you want battery-optimized network monitoring
 
 ---
 
@@ -448,7 +489,14 @@ This plugin is not supported on web. All methods will throw "Not implemented on 
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Latest version (2.0.1)**:
+**Latest version (2.1.0)**:
+- ✨ Added `isDateTimeChangedSimple()` method for iOS and Android
+- 🎯 Simple NTP-based detection matching Flutter plugin behavior
+- 📱 iOS: 30-second threshold check without caching
+- 📱 Android: Settings.Global.AUTO_TIME check
+- 🔧 Total: 12 methods (iOS), 2 methods (Android)
+
+**Previous version (2.0.1)**:
 - ✨ Added `isDateTimeChanged()` method for iOS and Android
 - 🔧 Simple wrapper returning inverse of `isAutoDateTimeEnabled`
 - 📱 Android now has 1 implemented method

@@ -57,7 +57,32 @@ export interface DateTimeSettingPlugin {
      * ```
      */
     isDateTimeChanged(): Promise<{ changed: boolean }>;
-    
+
+    /**
+     * Simple NTP-based check if date/time has been manually changed.
+     * Uses basic 30-second threshold comparison without caching.
+     * 
+     * This method matches Flutter plugin behavior exactly and provides
+     * a simpler, more predictable alternative to isDateTimeChanged().
+     * 
+     * Platform behavior:
+     * - iOS: Compares device time with NTP server (30s threshold)
+     * - Android: Checks Settings.Global.AUTO_TIME
+     * - Returns true if auto time is disabled or network fails (conservative)
+     * 
+     * @returns Promise with boolean indicating if auto time is disabled
+     * @since 2.1.0
+     * 
+     * @example
+     * ```typescript
+     * const result = await DateTimeSetting.isDateTimeChangedSimple();
+     * if (result.changed) {
+     *   console.log('Auto date/time is disabled');
+     * }
+     * ```
+     */
+    isDateTimeChangedSimple(): Promise<{ changed: boolean }>;
+
     // ===== Date/Time Change Detection =====
 
     /**
